@@ -118,3 +118,35 @@ function nhd_get_users_by_group_and_roles($gid=NULL, $rids=array(), $string='') 
   // get ALL THE THINGS!
   return $query->execute()->fetchAll();
 }
+
+/**
+ * get rid of teacher role on school groups
+ */
+$query = db_select('og_role')->fields('og_role', array('rid'))->condition('og_role.group_bundle', 'school', '=')->condition('og_role.name', 'teacher', '=')->execute()->fetch();
+
+  /**
+   * Renders the link.
+   */
+  function render_students($entity, $values) {
+
+    //dpm($values, 'values');
+    //get entry id
+    $entry_nid = $values->og_membership_gid;
+    //get contest id
+    $contest_nid = $values->field_og_contest_group_ref[0]['raw']['target_id'];
+    //get mship where gid=contest and etid=entry
+    $result = db_select('og_membership')
+      ->fields('og_membership')
+      ->condition('etid', $entry_nid, '=')
+      ->condition('gid', $contest_nid. '=')
+      ->execute()
+      ->fetchAll();
+    //dpm($result, 'result');
+
+    $link = 'group/node/'.$contest_nid.'/admin/people/delete-membership/'.$result[0]->id;
+    return $link;
+
+  }
+}
+
+
